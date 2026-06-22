@@ -1,64 +1,65 @@
-# JobFlow Local Standalone Desktop Setup (Option 2)
+# JobFlow Local Setup
 
-Welcome! By choosing **Option 2**, you have selected the lightweight, secure, and privacy-first local hosting model. This bundles both the React frontend and Node.js Express/Vite backend with your databases to run directly on your own machine. Your data remains stored inside your local directories (`jobs_db.json`, `emails_db.json`, etc.) and is never synced to external multi-tenant cloud storage unless you configure it.
+JobFlow runs as a local React and Express app. Your job pipeline, profile, email tracking state, and logs are stored in local JSON files in the project folder.
 
----
+## Prerequisites
 
-## 🚀 Quick Start Guide
+- Node.js 18 or newer
+- A Gemini API key for resume tailoring
+- Optional: a Google OAuth Web Client ID for Gmail sync
 
-### Step 1: Export Your Project
-1. Open the **Settings/Project Menu** in the Google AI Studio builder web page.
-2. Select **Export as ZIP** or **Export to GitHub**.
-3. Unzip the downloaded folder into any directory on your computer (e.g., `Documents/JobFlow`).
+## Windows
 
-### Step 2: Install Node.js (If you don't already have it)
-JobFlow's backend runs on Node.js to manage file storage and route LLM queries.
-* Download & install Node.js (version 18 or above is recommended) from [https://nodejs.org/](https://nodejs.org/).
-* The local launcher scripts will automatically check this and guide you on your first run.
+From PowerShell:
 
-### Step 3: Run the Desktop Boot Launcher
-We've built automated double-clickable launchers explicitly for your operating system:
+```powershell
+cd "C:\Users\Hubby\Desktop\Job Tracker and resume tailor"
+npm.cmd install
+npm.cmd run dev
+```
 
-#### 💻 Windows PC
-1. Double-click the file named `Run-JobFlow-Windows.bat` in the project root directory.
-2. A terminal window will open, perform the system health checks, automatically run `npm install` for you, copy your parameters template, and boot the backend.
-3. Your default web browser will automatically load the local address: [http://localhost:3000](http://localhost:3000).
+Open:
 
-#### 🍎 macOS or 🐧 Linux
-1. Open your terminal application.
-2. Navigate to your project folder:
-   ```bash
-   cd /path/to/downloaded/JobFlow
-   ```
-3. Make the script executable and run it:
-   ```bash
-   chmod +x Run-JobFlow-MacLinux.sh
-   ./Run-JobFlow-MacLinux.sh
-   ```
-4. Done! Your default browser will connect to the workspace.
+```text
+http://localhost:3000
+```
 
----
+If PowerShell blocks `npm`, keep using `npm.cmd`.
 
-## 🔑 AI Key Alignment
+## macOS or Linux
 
-To use Gemini's AI tailoring capabilities locally on your PC, you will need to add your personal developer API Key:
-1. Locate the `.env` file generated in the project root folder.
-2. Open it with any text editor (Notepad, TextEdit, VS Code).
-3. Find the line:
-   ```env
-   GEMINI_API_KEY="your_actual_api_key_here"
-   ```
-4. Replace `"your_actual_api_key_here"` with your real Google Gemini API Key from Google AI Studio.
-5. Save the file and restart your launcher!
+```bash
+cd /path/to/jobflow-resume-tailor
+npm install
+npm run dev
+```
 
----
+Open:
 
-## 🗄️ Where Is My Data Kept?
+```text
+http://localhost:3000
+```
 
-All your pipeline records, tailoring configurations, logs, and Gmail tracking rules are saved locally inside individual JSON schema files inside this root directory:
-* `jobs_db.json` — Stores actively captured corporate job records, match weights, and tailored summaries.
-* `profile_db.json` — Pre-loaded with your default candidate resume, certification matrix, and credentials.
-* `emails_db.json` — Tracks sorted communication details.
-* `logs_db.json` — System tracer notes detailing live routing actions.
+## Environment Variables
 
-You are completely in control of your data. To backup your entries, simply duplicate these files or backup your entire unzipped directory!
+Create or edit `.env` in the project root:
+
+```env
+GEMINI_API_KEY="your_gemini_api_key"
+GOOGLE_CLIENT_ID="your_google_oauth_web_client_id.apps.googleusercontent.com"
+APP_URL="http://localhost:3000"
+```
+
+Never commit `.env` to GitHub.
+
+## Local Data Files
+
+The app uses local JSON files:
+
+- `jobs_db.json`: job applications and tailored resume metadata
+- `profile_db.json`: base profile and resume text
+- `emails_db.json`: simulated/local email records
+- `logs_db.json`: app activity logs
+- `deleted_jobs_db.json`: deleted job tombstones
+
+To back up the app, copy the whole project folder or copy the JSON files above.

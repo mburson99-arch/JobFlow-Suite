@@ -5,6 +5,9 @@ import Markdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import { downloadResumePdf } from "../lib/downloadResumePdf";
 import { EXPERT_POLISH_PROMPT } from "../lib/resumePrompts";
+import { DEFAULT_CRITIQUE_PROMPT, DEFAULT_RESUME_TAILOR_PROMPT } from "../lib/promptDefaults";
+import { useLocalStorageState } from "../hooks/useLocalStorageState";
+import PromptOverridePanel from "./PromptOverridePanel";
 
 interface ResumeTailorProps {
   selectedJob: Job | null;
@@ -37,6 +40,14 @@ export default function ResumeTailor({
   const [errorMsg, setErrorMsg] = useState("");
   const [customInstructions, setCustomInstructions] = useState("");
   const [aiResponseText, setAiResponseText] = useState("");
+  const [selectedGithubUrl, setSelectedGithubUrl] = useState("");
+  const [githubSelectionReason, setGithubSelectionReason] = useState("");
+  const [showTailorPromptEditor, setShowTailorPromptEditor] = useState(false);
+  const [showCritiquePromptEditor, setShowCritiquePromptEditor] = useState(false);
+  const [showPolishPromptEditor, setShowPolishPromptEditor] = useState(false);
+  const [tailorPromptOverride, setTailorPromptOverride] = useLocalStorageState<string>("jobflow_prompt_resume_tailor", DEFAULT_RESUME_TAILOR_PROMPT);
+  const [critiquePromptOverride, setCritiquePromptOverride] = useLocalStorageState<string>("jobflow_prompt_resume_critique", DEFAULT_CRITIQUE_PROMPT);
+  const [polishPromptOverride, setPolishPromptOverride] = useLocalStorageState<string>("jobflow_prompt_resume_polish", EXPERT_POLISH_PROMPT);
   
   const [isEditingResume, setIsEditingResume] = useState(false);
   const resumePrintRef = useRef<HTMLDivElement>(null);
@@ -55,12 +66,16 @@ export default function ResumeTailor({
         setTailoredResumeText(selectedJob.tailoredResumeText || "");
         setMatchScore(selectedJob.matchScore || 0);
         setAiResponseText(selectedJob.aiResponse || "");
+        setSelectedGithubUrl(selectedJob.selectedGithubUrl || "");
+        setGithubSelectionReason(selectedJob.githubSelectionReason || "");
         setActiveTab("critique");
       } else {
         setCritiqueMarkdown("");
         setTailoredResumeText("");
         setMatchScore(null);
         setAiResponseText("");
+        setSelectedGithubUrl("");
+        setGithubSelectionReason("");
         setActiveTab("input");
       }
     }
@@ -104,6 +119,9 @@ export default function ResumeTailor({
           jobDescription: jobDescription,
           customInstructions: instructionToSend,
           currentDraft: tailoredResumeText,
+          promptOverride: tailorPromptOverride,
+          critiquePromptOverride,
+          githubProfiles: profile.githubProfiles || [],
         }),
       });
 
@@ -117,6 +135,8 @@ export default function ResumeTailor({
       setMatchScore(data.matchScore);
       setSuggestedSkills(data.suggestedSkills || []);
       setAiResponseText(data.aiResponse || "");
+      setSelectedGithubUrl(data.selectedGithubUrl || "");
+      setGithubSelectionReason(data.githubSelectionReason || "");
       setCustomInstructions("");
 
       // Inform parent
@@ -160,7 +180,7 @@ export default function ResumeTailor({
       return;
     }
     
-    await handleTailorCall(EXPERT_POLISH_PROMPT);
+    await handleTailorCall(polishPromptOverride);
   };
   return (
     <div className="flex-1 flex flex-col gap-3.5 overflow-hidden" id="resume-tailoring-module">
@@ -252,6 +272,26 @@ export default function ResumeTailor({
                   placeholder="Paste core requirements or metadata copy-pasted directly from Indeed / Linkedin..."
                 />
               </div>
+
+              <PromptOverridePanel
+                title="Customize Tailoring Prompt"
+                description="Beta control: change the main Gemini resume tailoring rules before each compile. The app still enforces JSON output, honesty, contact integrity, and visible URL rules."
+                value={tailorPromptOverride}
+                defaultValue={DEFAULT_RESUME_TAILOR_PROMPT}
+                isOpen={showTailorPromptEditor}
+                onToggle={() => setShowTailorPromptEditor((value) => !value)}
+                onChange={setTailorPromptOverride}
+              />
+
+              <PromptOverridePanel
+                title="Customize Brutal Critique Prompt"
+                description="Beta control: change how Gemini writes the critique section. Use this to make the feedback stricter, softer, shorter, or more focused on relocation and missing skills."
+                value={critiquePromptOverride}
+                defaultValue={DEFAULT_CRITIQUE_PROMPT}
+                isOpen={showCritiquePromptEditor}
+                onToggle={() => setShowCritiquePromptEditor((value) => !value)}
+                onChange={setCritiquePromptOverride}
+              />
 
               <div>
                 <label className="block text-[10px] font-bold font-mono text-blue-450 uppercase flex items-center gap-1 mb-1">
@@ -423,6 +463,28 @@ export default function ResumeTailor({
                       </button>
                     </div>
                   </div>
+
+                  <PromptOverridePanel
+                    title="Customize Second-Draft Polish Prompt"
+                    description="Beta control: tune the human-style second pass. Use this when you want stricter wording, different tone, or different polishing rules without changing the main tailor prompt."
+                    value={polishPromptOverride}
+                    defaultValue={EXPERT_POLISH_PROMPT}
+                    isOpen={showPolishPromptEditor}
+                    onToggle={() => setShowPolishPromptEditor((value) => !value)}
+                    onChange={setPolishPromptOverride}
+                  />
+
+                  {(selectedGithubUrl || githubSelectionReason) && (
+                    <div className="bg-faction-panel-header/40 border border-faction-border rounded p-3 font-mono text-[10px] text-faction-text-muted">
+                      <div className="font-black uppercase tracking-wider text-faction-accent mb-1">Selected GitHub For This Job</div>
+                      {selectedGithubUrl && (
+                        <div className="break-all text-faction-text">{selectedGithubUrl}</div>
+                      )}
+                      {githubSelectionReason && (
+                        <div className="mt-1 leading-relaxed">{githubSelectionReason}</div>
+                      )}
+                    </div>
+                  )}
 
                   <div className="bg-faction-bg rounded border border-faction-border shadow-sm p-4 text-[12px] min-h-[400px] text-faction-text font-mono select-text" id="tailored-resume-print-node-outer">
                     {isEditingResume ? (

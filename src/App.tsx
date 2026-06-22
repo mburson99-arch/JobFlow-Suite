@@ -8,6 +8,7 @@ import ExtensionPanel from "./components/ExtensionPanel";
 import Configuration from "./components/Configuration";
 import ManualReviewModal from "./components/ManualReviewModal";
 import AIConsole from "./components/AIConsole";
+import GithubProfiles from "./components/GithubProfiles";
 import {
   initAuth,
   googleSignIn,
@@ -45,7 +46,7 @@ export default function App() {
     setFaction(nextFaction);
   };
 
-  const [activeTab, setActiveTab] = useLocalStorageState<"dashboard" | "tailor" | "emails" | "extension" | "config" | "export" | "gemini">("jobflow_active_tab", "dashboard");
+  const [activeTab, setActiveTab] = useLocalStorageState<"dashboard" | "tailor" | "emails" | "extension" | "config" | "export" | "gemini" | "github">("jobflow_active_tab", "dashboard");
   const [jobs, setJobs, clearCachedJobs] = useLocalStorageState<Job[]>("jobflow_jobs", []);
   const [deletedJobs, setDeletedJobs] = useState<Job[]>([]);
   const [profile, setProfile] = useState<CandidateProfile>({
@@ -54,6 +55,14 @@ export default function App() {
     phone: "740.755.0345",
     website: "https://github.com/mburson99-arch",
     resumeText: "",
+    githubProfiles: [
+      {
+        id: "primary-github",
+        label: "Primary GitHub",
+        url: "https://github.com/mburson99-arch",
+        notes: "Default portfolio profile for IT support, Active Directory, Splunk, and service desk lab projects.",
+      },
+    ],
   });
   const [emails, setEmails] = useState<EmailAlert[]>([]);
   const [logs, setLogs] = useState<LogMessage[]>([]);
@@ -883,6 +892,17 @@ export default function App() {
           </button>
 
           <button
+            onClick={() => setActiveTab("github")}
+            className={`flex items-center gap-2.5 px-3 py-2 rounded font-mono font-bold text-xs text-left cursor-pointer transition-all border ${
+              activeTab === "github"
+                ? "bg-faction-primary text-faction-text border-faction-accent-border/40 shadow-md"
+                : "border-transparent text-faction-text-muted hover:bg-faction-panel-header/80 hover:text-faction-text"
+            }`}
+          >
+            <span>🐙 GitHub Profiles</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab("emails")}
             className={`flex items-center justify-between gap-2 px-3 py-2 rounded font-mono font-bold text-xs text-left cursor-pointer transition-all border ${
               activeTab === "emails"
@@ -972,6 +992,13 @@ export default function App() {
             onUpdateProfile={handleUpdateProfile}
             onTailoringComplete={fetchData}
             onStatusUpdate={handleUpdateJobStatus}
+          />
+        )}
+
+        {activeTab === "github" && (
+          <GithubProfiles
+            profile={profile}
+            onUpdateProfile={handleUpdateProfile}
           />
         )}
 

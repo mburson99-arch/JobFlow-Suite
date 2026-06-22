@@ -15,6 +15,15 @@ export interface Job {
   emailUpdateCount?: number;
   requiresRelocation?: boolean;
   aiResponse?: string;
+  selectedGithubUrl?: string;
+  githubSelectionReason?: string;
+}
+
+export interface GithubProfile {
+  id: string;
+  label: string;
+  url: string;
+  notes: string;
 }
 
 export interface CandidateProfile {
@@ -23,6 +32,7 @@ export interface CandidateProfile {
   phone: string;
   website: string;
   resumeText: string;
+  githubProfiles?: GithubProfile[];
 }
 
 export interface EmailAlert {

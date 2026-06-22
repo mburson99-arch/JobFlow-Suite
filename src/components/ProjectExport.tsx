@@ -172,52 +172,65 @@ export default function ProjectExport() {
     }, 1000);
   };
 
-  const readmeContent = `# JobFlow: AI-Powered Career Pipeline & Gmail Sync Controller
+  const readmeContent = `# JobFlow Resume Tailor
 
-An advanced, privacy-first career CRM and live application response monitor built to simplify, automate, and organize your job search cycle. It dynamically synchronizes with your personal Gmail inbox, isolates recruiter discussions directly against active pipeline application records, and tailors candidate credentials on-demand.
+JobFlow Resume Tailor is a local-first career workflow app for tracking job applications, tailoring resumes with Gemini, and monitoring Gmail responses from companies in the pipeline.
 
-## Key Subsystems
-1. **Intelligent Tracking Dashboard:** Organize job roles, status transitions, and timeline logs.
-2. **AI Resume Context Tailor:** Direct model mapping to realign skill matrix markers with target descriptions.
-3. **Smart Inbound Context Monitor:** Deep context matching system parsing real-time transactional recruiter notifications from parent sources (Indeed, LinkedIn, handshakes) and sorting them instantly under relevant jobs.
-4. **Chrome Sandbox Bridge:** Secure input interfaces to capture descriptions web-side.
+The project started as a rough AI Studio prototype and was gradually cleaned into a more stable React/Express application. The current version focuses on practical job-search workflow support: capture a role, store the job description, tailor a resume against that description, export a polished PDF, and track follow-up email activity in one dashboard.
 
-## Critical Engineering Lessons Learned & Resolutions
+## Core Features
 
-### 1. LinkedIn & Job Board Iframe Blocking (CORS Sandbox Rule Breach)
-*   **The Problem:** Standard iframe embeds and scraping requests toward LinkedIn & Indeed jobs immediately trigger severe CORS policy rules, active CAPTCHA blockades, and HTTP 403 authorization failures.
-*   **The Fix:** Pivoted away from synchronous scraping servers. Implemented a local Chrome Extension JSON data payload receiver model. This reads job posting DOM segments locally inside the user's browser, passing data cleanly via standard background messaging pipes.
+- Spreadsheet-style job application dashboard
+- Gemini resume critique and tailoring workflow
+- Beta prompt override panels for tailoring, critique, polish, and keyword search
+- Multi-GitHub profile selector for job-specific portfolio choice
+- Human-style second draft polish prompt
+- PDF resume export from the rendered preview
+- Gmail response monitor with company/job grouping
+- Chrome extension guidance for Indeed and LinkedIn capture
+- Local JSON persistence for jobs, profile, emails, and logs
+- GitHub Export panel with sanitized project story assets
 
-### 2. LLM Resume Realignment (Gemini Parsing Noise)
-*   **The Problem:** Sending arbitrary resume segments directly to the Google Gemini model often stripped standardized bullet-point formatting, injected hallucinated framework details, or went beyond safety-token sizes.
-*   **The Fix:** Engineered structural template blocks. Each candidate profile is partitioned into modular nodes (Skills, Career history, Project tags). We parse text through rigorous structured schemas, asking the model to only output direct, high-value keyword improvements while preserving the original layout structure.
+## Engineering Journey
 
-### 3. Recruiter Message Routing & Context Gaps (The "Mercer Indeed" Issue)
-*   **The Problem:** Notification emails from job platforms are sent from generic system addresses (such as \`indeedapply@indeed.com\`) without explicit company sender records in the header. Relying on simple company-name searches on headers or subject lines fails to identify the real recipient categorization (e.g., mail context references "Mercer Bucks" but sender is just "Indeed").
-*   **The Fix:** Built a sophisticated multi-factor grouping scoring engine. This parses the entire incoming base64 body text, tokenizes company names and application parameters, counts contextual occurrences, and scores matches dynamically. Any score reaching the fallback threshold automatically binds that email to the correct dashboard partition.
+This project documents the messy middle of building a real tool with AI assistance:
 
-## Future Vision & Upcoming Features
-*   **Multi-Mailbox Sync Controller:** Add background listeners for Microsoft Outlook API, Yahoo Careers, and personal iCloud mailboxes.
-*   **Semantic Sentiment Mapping (RAG Integration):** Run tiny vector embedding comparisons in-browser to automatically highlight and prompt candidates about highly urgent scheduling requests.
-*   **Bi-Directional Recruiter Cold-Email Drafter:** Automatically compose initial outreach drafts referencing the specific parsed pipeline job.
-*   **Simulated AI Mock Interviewer:** Synthesize realistic vocal scenarios calibrated around actual isolated email timelines.
+- Direct Indeed/LinkedIn capture failed several times because of CORS, CSP, iframe behavior, and Chrome extension messaging rules.
+- Gmail matching missed portal messages from Indeed Apply and Workday until sender, subject, snippet, decoded HTML, and body text were all included in matching.
+- Gemini resume output needed stronger rules for honesty, visible URLs, current dates, and non-robotic wording.
+- PDF export went through multiple approaches before aligning closer to the rendered preview.
+- Deleted applications reappeared until the app added deletion tracking and better active/deleted state handling.
+- Firebase was removed after IAM/domain friction, and the app moved toward direct Google OAuth and Gmail API usage.
 
----
+## Tech Stack
 
-## Setup & Running Locally
-\`\`\`bash
-# Install dependencies
-npm install
+- React
+- TypeScript
+- Vite
+- Express
+- Google Gemini API
+- Gmail API with Google OAuth
+- Tailwind CSS
+- Local JSON storage
 
-# Start development workspace
-npm run dev
+## Local Setup
 
-# Run full TypeScript static safety compilation
-npm run build
+\`\`\`powershell
+npm.cmd install
+npm.cmd run dev
 \`\`\`
+
+Open http://localhost:3000.
+
+## Docs
+
+- docs/DEVELOPMENT_JOURNEY.md
+- docs/TROUBLESHOOTING_LOG.md
+- docs/ROADMAP.md
+- docs/SCREENSHOTS.md
 `;
 
-  const aboutContent = `JobFlow combines Google Gemini AI model capabilities and live Google Workspace APIs into a secure, single-screen career manager. Built using React, Tailwind Utility styling, and persistent local caching layers, the app serves as a robust tool for job hunters to streamline their daily pipelines, and preserve record trace logs without exposing data to external systems.`;
+  const aboutContent = `Local-first job application tracker with Gemini resume tailoring, Gmail response monitoring, Chrome extension capture flow, and PDF resume export.`;
 
   return (
     <div className="flex-1 overflow-y-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6" id="project-export-panel">
@@ -296,11 +309,11 @@ npm run build
                   3. Gmail Notification Routing Context Gap ("Mercer Indeed" Issue)
                 </h4>
                 <p className="text-[11px] text-slate-600 mt-1 pb-2 border-b border-dashed border-slate-100">
-                  <strong>The Issue:</strong> Recruiter notifications from intermediary portals like <em>Indeed Apply</em> appear from generic domains, bypassing standard header rules. Incoming mails talking about "Mercer" are sent by Indeed sender tags, which simple subject-line checkers put in Uncategorized.
+                  <strong>The Issue:</strong> Recruiter notifications from intermediary portals like <em>Indeed Apply</em> can arrive from generic domains, bypassing simple sender and subject rules. Emails that mention the real company only in the body can be misfiled as uncategorized.
                 </p>
                 <p className="text-[11px] text-emerald-700 font-medium mt-1.5 flex items-center gap-1">
                   <ArrowRight className="w-3 h-3 text-emerald-600" />
-                  <strong>Resolution:</strong> Implemented a dynamic multi-factor scoring algorithm. We scan the decrypted base64 body context, match localized query tokens (weight score increments), and dynamically map relationships to correct pipeline keys (such as Mercer) regardless of header wrappers.
+                  <strong>Resolution:</strong> Implemented a multi-factor matching algorithm that checks sender, subject, snippet, and decoded body text before routing a message to the most likely application.
                 </p>
               </div>
             </div>
@@ -374,7 +387,7 @@ npm run build
                 <div>
                   <h4 className="text-xs font-bold text-slate-100">Run-JobFlow-Windows.bat</h4>
                   <p className="text-[10px] text-slate-400 mt-0.5 leading-normal">
-                    Double-click launcher for Windows. Performs Node.js health checks, provisions dependencies automatically, copy templates, and opens your browser directly on port 3000.
+                    Double-click launcher for Windows. It performs Node.js health checks, provisions dependencies automatically, copies templates, and opens your browser on port 3000.
                   </p>
                   <div className="flex items-center gap-1.5 mt-2">
                     <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
@@ -391,7 +404,7 @@ npm run build
                 <div>
                   <h4 className="text-xs font-bold text-slate-100">Run-JobFlow-MacLinux.sh</h4>
                   <p className="text-[10px] text-slate-400 mt-0.5 leading-normal">
-                    Interactive executable terminal script. Stáges local environmental variables, setups local caches, and registers listener processes on your Apple Mac or Linux system.
+                    Interactive terminal script for macOS or Linux. It checks the local environment, installs dependencies when needed, and starts the local server.
                   </p>
                   <div className="flex items-center gap-1.5 mt-2">
                     <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
@@ -438,7 +451,7 @@ npm run build
                     <div>
                       <h4 className="text-[11px] font-bold text-slate-200">Locate Export Button In Tool Header</h4>
                       <p className="text-[10px] text-slate-400 mt-0.5 leading-normal">
-                        Look at the **top bar menu options** or the **Settings menu** of the AI Studio website (the browser chrome surrounding this application). Click on the <strong>Export</strong> option, or use the menu in the upper right.
+                        Use the project export controls from your workspace or download the source from GitHub after pushing the repository.
                       </p>
                     </div>
                   </div>

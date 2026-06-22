@@ -13,7 +13,9 @@ export function downloadResumePdf(printNode: HTMLElement, options: PdfOptions = 
       html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: "mm", format: "letter", orientation: "portrait" as const },
       pagebreak: { mode: ["css", "legacy"] },
-    })
+    } as any)
     .from(printNode)
     .save();
 }
+
+

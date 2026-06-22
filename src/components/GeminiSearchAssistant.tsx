@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { Search, Sparkles, Loader2, Copy } from "lucide-react";
+import { DEFAULT_KEYWORD_SEARCH_PROMPT } from "../lib/promptDefaults";
+import { useLocalStorageState } from "../hooks/useLocalStorageState";
+import PromptOverridePanel from "./PromptOverridePanel";
 
 interface KeywordResult {
   coreKeywords: string[];
@@ -14,6 +17,8 @@ export default function GeminiSearchAssistant() {
   const [result, setResult] = useState<KeywordResult | null>(null);
   const [error, setError] = useState("");
   const [copiedText, setCopiedText] = useState("");
+  const [showPromptEditor, setShowPromptEditor] = useState(false);
+  const [promptOverride, setPromptOverride] = useLocalStorageState<string>("jobflow_prompt_keyword_search", DEFAULT_KEYWORD_SEARCH_PROMPT);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +32,7 @@ export default function GeminiSearchAssistant() {
       const response = await fetch("/api/keywords/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ query, promptOverride }),
       });
 
       if (!response.ok) {
@@ -94,6 +99,15 @@ export default function GeminiSearchAssistant() {
             </button>
             {error && <p className="text-red-400 text-[10px]">{error}</p>}
           </form>
+          <PromptOverridePanel
+            title="Customize Keyword Prompt"
+            description="Beta control: reword how Gemini recommends search titles, keywords, and Boolean strings. Keep it practical if you want stable results."
+            value={promptOverride}
+            defaultValue={DEFAULT_KEYWORD_SEARCH_PROMPT}
+            isOpen={showPromptEditor}
+            onToggle={() => setShowPromptEditor((value) => !value)}
+            onChange={setPromptOverride}
+          />
         </div>
 
         {/* Results Section */}

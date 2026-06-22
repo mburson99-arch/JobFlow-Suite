@@ -43,6 +43,7 @@ export default function Configuration({ profile, onUpdateProfile, onResetPipelin
       phone,
       website,
       resumeText,
+      githubProfiles: profile.githubProfiles,
     });
     setShowSavedMsg(true);
     setTimeout(() => {

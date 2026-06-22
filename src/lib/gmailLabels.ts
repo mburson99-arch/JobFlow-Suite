@@ -102,7 +102,7 @@ export async function applyJobFlowLabel(
  */
 export async function syncMatchedEmailsToJobFlowLabel(
   accessToken: string,
-  emails: EmailForMatch & { id: string }[],
+  emails: Array<EmailForMatch & { id: string }>,
   jobs: Job[]
 ): Promise<{ labeled: number; skipped: number }> {
   if (!emails.length || !jobs.length) {
@@ -141,3 +141,4 @@ export async function syncMatchedEmailsToJobFlowLabel(
 
   return { labeled, skipped };
 }
+
