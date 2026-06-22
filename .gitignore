@@ -10,3 +10,12 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Local database files (contain personal data)
+*_db.json
+
+# Firebase config with API keys
+firebase-applet-config.json
+
+# Backup folders
+.backups/
