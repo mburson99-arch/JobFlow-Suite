@@ -106,7 +106,7 @@ JobFlow Suite follows a client-server architecture where both components run loc
 
 - **Node.js 18+** ([download here](https://nodejs.org/))
 - **Google Gemini API Key** ([get one free from AI Studio](https://aistudio.google.com/app/apikey))
-- **Google OAuth Client ID** (optional, for Gmail integration)
+- **Google OAuth Client ID** (optional, for Gmail integration - no Firebase required)
 
 ### Quick Start
 
@@ -182,7 +182,7 @@ This project was built as a learning exercise using an AI-assisted workflow with
 - **Gmail Matching False Positives**: Early versions matched too broadly. Solution: Multi-factor scoring using sender, subject, company name, and email body content
 - **AI Resume Drift**: Gemini initially generated generic corporate jargon and hid URLs in Markdown links. Solution: Strict prompt rules enforcing visible URLs, modern dates, and honest language
 - **PDF Export Inconsistencies**: Browser print and early html2pdf attempts added timestamps or broke formatting. Solution: Refined CSS and page-break rules
-- **Firebase Complexity**: Original OAuth flow was over-engineered. Solution: Direct Google OAuth with simpler token management
+- **Firebase Complexity**: Original OAuth flow used Firebase, adding unnecessary complexity. Solution: Removed Firebase entirely, switched to direct Google OAuth with simpler token management
 
 The full development journey, including dead ends and pivots, is documented in [`docs/DEVELOPMENT_JOURNEY.md`](docs/DEVELOPMENT_JOURNEY.md).
 
